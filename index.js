@@ -30,12 +30,40 @@ app.get("/hi", (req, res)=>{
     res.json("hi there");
 });
 
-app.get("/people", (req, res)=>{
+app.get("/student", async (req, res)=>{
     console.log("people resquest");
-    res.json([
-        {name: "John", role:"ds"},
-        {name: "raj", role:"os"}
-]);
+    let data= await Student.find().catch(err=>{
+        res.json("error loading data");
+    });
+    res.json(data);
+});
+
+app.get('/student/:id',async(req,res)=>{
+    let id=req.params.id;
+    let data=await Student.findById(id).catch(err=>{
+        res.json("Error finding person");
+
+    });
+    if(!data){
+        res.json('not found');
+
+    }
+    else{
+        res.json(data);
+    }
+});
+
+app.delete('/student/:id',async(req,res)=>{
+    let id=req.params.id;
+    await Student.findByIdAndDelete(id)
+    .then(()=>{
+        res.json('deleted successfully');
+
+    })
+    .catch(err=>{
+        res.json("Error deleting person");
+        
+    });
 });
 
 app.get("/students", (req, res)=>{
@@ -50,7 +78,7 @@ app.get("/students", (req, res)=>{
 app.post("/student", (req, res)=>{
     console.log(req.body);
     let student=new Student(req.body);
-    student.save()
+    Student.save()
     .then(()=>{
         res.json("saved successfully")
     })
